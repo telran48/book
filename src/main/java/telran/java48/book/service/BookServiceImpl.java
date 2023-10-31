@@ -76,9 +76,11 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public Iterable<BookDto> findBooksByPublisher(String publisherName) {
-		// TODO Auto-generated method stub
-		return null;
+		return bookRepository.findByPublisherPublisherName(publisherName)
+				.map(b -> modelMapper.map(b, BookDto.class))
+				.collect(Collectors.toList());
 	}
 
 	@Override
