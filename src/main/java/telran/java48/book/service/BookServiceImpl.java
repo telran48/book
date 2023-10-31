@@ -34,11 +34,11 @@ public class BookServiceImpl implements BookService {
 		}
 		//Publisher
 		Publisher publisher = publisherRepository.findById(bookDto.getPublisher())
-				.orElse(publisherRepository.save(new Publisher(bookDto.getPublisher())));
+				.orElseGet(() -> publisherRepository.save(new Publisher(bookDto.getPublisher())));
 		//Authors
 		Set<Author> authors = bookDto.getAuthors().stream()
 						.map(a -> authorRepository.findById(a.getName())
-								.orElse(authorRepository.save(new Author(a.getName(), a.getBirthDate()))))
+								.orElseGet(() -> authorRepository.save(new Author(a.getName(), a.getBirthDate()))))
 						.collect(Collectors.toSet());
 		Book book = new Book(bookDto.getIsbn(), bookDto.getTitle(), authors, publisher);
 		bookRepository.save(book);
@@ -103,7 +103,7 @@ public class BookServiceImpl implements BookService {
 	@Transactional
 	public AuthorDto removeAuthor(String authorName) {
 		Author author = authorRepository.findById(authorName).orElseThrow(EntityNotFoundException::new);
-		authorRepository.deleteById(authorName);
+		authorRepository.delete(author);
 		return modelMapper.map(author, AuthorDto.class);
 	}
 
